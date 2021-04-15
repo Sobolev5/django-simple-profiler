@@ -39,4 +39,4 @@ def get_countries(request):
 ```
 
 
-![ScreenShot](screenshots/screenshot.png)
+![ScreenShot](https://github.com/Sobolev5/django-simple-profiler/blob/master/screenshots/screen.png)
