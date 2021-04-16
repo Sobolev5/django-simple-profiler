@@ -68,11 +68,17 @@ def _table_response_timing(lineno, total_time, total_queries_time, queries_count
 
 def _table_response_queries(lineno, queries):
     queries_table = []
-    for query in queries:
-        queries_table.append([query["sql"][:200]])
+    if not queries:
+        queries_table.append(["No sql queries"])
+    else:
+        for query in queries:
+            queries_table.append([query["sql"][:200]])
     table_data = queries_table
     len_queries = len(queries)
-    table_instance = SingleTable(table_data, f" {lineno} top {len_queries} queries ")
+    if not queries:
+        table_instance = SingleTable(table_data, f" queries ")
+    else:
+        table_instance = SingleTable(table_data, f" {lineno} top {len_queries} queries ")
     table_instance.inner_heading_row_border = False
     return table_instance.table
 

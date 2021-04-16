@@ -38,5 +38,5 @@ def get_countries(request):
     return HttpResponse("OK")
 ```
 
+![](https://github.com/Sobolev5/django-simple-profiler/blob/master/screenshots/screen.png)
 
-![ScreenShot](https://github.com/Sobolev5/django-simple-profiler/blob/master/screenshots/screen.png)
