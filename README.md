@@ -32,9 +32,15 @@ def get_countries(request):
     return HttpResponse("OK")
 
 def get_countries(request):
+
     with DjangoProfiler() as dp:
         for country in Country.objects.all():
             print(country)
+
+    with DjangoProfiler(label="ActiveCountries") as dp:
+        for country in Country.objects.filter(active=True):
+            print(country)
+
     return HttpResponse("OK")
 ```
 

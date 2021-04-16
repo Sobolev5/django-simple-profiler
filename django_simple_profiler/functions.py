@@ -32,9 +32,15 @@ def get_countries(request):
     return HttpResponse("OK")
 
 def get_countries(request):
+
     with DjangoProfiler() as dp:
         for country in Country.objects.all():
             print(country)
+
+    with DjangoProfiler(label="ActiveCountries") as dp:
+        for country in Country.objects.filter(active=True):
+            print(country)
+
     return HttpResponse("OK")
 
 """
@@ -111,7 +117,7 @@ def django_profiler(func):
             queries_list = []
             for query in connection.queries:
                 if query["sql"]:
-                    prettify_sql = "\033[1;31m[{}]\033[0m {}".format(query["time"], query["sql"].replace('"', "").replace(",", ", "))
+                    prettify_sql = "[{}] {}".format(query["time"], query["sql"].replace('"', "").replace(",", ", "))
                     total_queries_time += float(query["time"])
                     queries_list.append({"sql": (f"{prettify_sql}\n"), "time": float(query["time"])})
             queries_list = sorted(queries_list, key=lambda x: -x["time"])
@@ -134,12 +140,16 @@ def django_profiler(func):
 
 
 @contextmanager
-def DjangoProfiler():
+def DjangoProfiler(label=None):
     if settings.DEBUG:
 
         current_line_no = inspect.stack()[2][2]
         current_function_name = inspect.stack()[2][3]
-        lineno = f"{current_function_name} [{current_line_no}]"
+
+        if label:
+            lineno = f"\033[1;31m{label}\033[0m [{current_line_no}]"
+        else:
+            lineno = f"{current_function_name} [{current_line_no}]"
 
         time_start = time.process_time()
         memory_before = _get_process_memory()
@@ -151,7 +161,7 @@ def DjangoProfiler():
         queries_list = []
         for query in connection.queries:
             if query["sql"]:
-                prettify_sql = "\033[1;31m[{}]\033[0m {}".format(query["time"], query["sql"].replace('"', "").replace(",", ", "))
+                prettify_sql = "[{}] {}".format(query["time"], query["sql"].replace('"', "").replace(",", ", "))
                 total_queries_time += float(query["time"])
                 queries_list.append({"sql": (f"{prettify_sql}\n"), "time": float(query["time"])})
         queries_list = sorted(queries_list, key=lambda x: -x["time"])
