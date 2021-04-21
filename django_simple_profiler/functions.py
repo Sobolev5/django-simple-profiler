@@ -4,7 +4,6 @@ import os
 import time
 from contextlib import contextmanager
 from functools import wraps
-
 import psutil
 from colorclass import Color
 from django.conf import settings
@@ -33,11 +32,23 @@ def get_countries(request):
 
 def get_countries(request):
 
-    with DjangoProfiler() as dp:
+    # simple
+    with DjangoProfiler() as dp: 
         for country in Country.objects.all():
             print(country)
 
+    # full queries
+    with DjangoProfiler(full=True) as dp:
+        for country in Country.objects.all():
+            print(country)
+
+    # with label
     with DjangoProfiler(label="ActiveCountries") as dp:
+        for country in Country.objects.filter(active=True):
+            print(country)
+
+    # with label and full queries
+    with DjangoProfiler(label="ActiveCountries", full=True) as dp:
         for country in Country.objects.filter(active=True):
             print(country)
 
@@ -87,6 +98,13 @@ def _table_response_queries(lineno, queries):
         table_instance = SingleTable(table_data, f" {lineno} top {len_queries} queries ")
     table_instance.inner_heading_row_border = False
     return table_instance.table
+
+
+def _single_line_response_queries(lineno, queries):
+    len_queries = len(queries)
+    print(f"{lineno} {len_queries} queries:\n")
+    for query in queries:
+        print(query["sql"])
 
 
 def _table_response_memory(lineno, memory_before, memory_after, memory_difference):
@@ -140,7 +158,7 @@ def django_profiler(func):
 
 
 @contextmanager
-def DjangoProfiler(label=None):
+def DjangoProfiler(label=None, full=None):
     if settings.DEBUG:
 
         current_line_no = inspect.stack()[2][2]
@@ -170,7 +188,10 @@ def DjangoProfiler(label=None):
         print()
         print(_table_response_timing(lineno, total_request_time, total_queries_time, queries_count))
         print()
-        print(_table_response_queries(lineno, queries_list[:10]))
+        if full:
+            _single_line_response_queries(lineno, queries_list)
+        else:
+            print(_table_response_queries(lineno, queries_list[:10]))
         print()
         print(_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before))
         print()
