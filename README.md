@@ -33,11 +33,23 @@ def get_countries(request):
 
 def get_countries(request):
 
-    with DjangoProfiler() as dp:
+    # simple
+    with DjangoProfiler() as dp: 
         for country in Country.objects.all():
             print(country)
 
+    # full queries
+    with DjangoProfiler(full=True) as dp:
+        for country in Country.objects.all():
+            print(country)
+
+    # with label
     with DjangoProfiler(label="ActiveCountries") as dp:
+        for country in Country.objects.filter(active=True):
+            print(country)
+
+    # with label and full queries
+    with DjangoProfiler(label="ActiveCountries", full=True) as dp:
         for country in Country.objects.filter(active=True):
             print(country)
 
