@@ -20,12 +20,18 @@ pip install django-simple-profiler
 
 # example.py
 ```python
-from django.http import HttpResponse
 from django_simple_profiler import django_profiler # as decorator
+from django_simple_profiler import django_profiler_full # as decorator with full queries
 from django_simple_profiler import DjangoProfiler # as context manager
 
 
 @django_profiler
+def get_countries(request):
+    for country in Country.objects.all():
+        print(country)
+    return HttpResponse("OK")
+
+@django_profiler_full
 def get_countries(request):
     for country in Country.objects.all():
         print(country)

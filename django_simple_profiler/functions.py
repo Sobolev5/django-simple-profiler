@@ -21,10 +21,17 @@ requires DEBUG=True in settings.py
 Example:
 
 from django_simple_profiler import django_profiler # as decorator
+from django_simple_profiler import django_profiler_full # as decorator with full queries
 from django_simple_profiler import DjangoProfiler # as context manager
 
 
 @django_profiler
+def get_countries(request):
+    for country in Country.objects.all():
+        print(country)
+    return HttpResponse("OK")
+
+@django_profiler_full
 def get_countries(request):
     for country in Country.objects.all():
         print(country)
@@ -119,8 +126,7 @@ def _table_response_memory(lineno, memory_before, memory_after, memory_differenc
 
 
 def django_profiler(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):    
         if settings.DEBUG:
             current_line_no = func.__code__.co_firstlineno
             current_function_name = func.__name__
@@ -156,6 +162,43 @@ def django_profiler(func):
 
     return wrapper
 
+
+def django_profiler_full(func):
+    def wrapper(*args, **kwargs):    
+        if settings.DEBUG:
+            current_line_no = func.__code__.co_firstlineno
+            current_function_name = func.__name__
+            lineno = f"{current_function_name} [{current_line_no}]"
+            time_start = time.process_time()
+            memory_before = _get_process_memory()
+            reset_queries()
+            response = func(*args, **kwargs)
+            memory_after = _get_process_memory()
+            total_queries_time = 0.0
+            queries_count = len(connection.queries)
+            queries_list = []
+            for query in connection.queries:
+                if query["sql"]:
+                    prettify_sql = "[{}] {}".format(query["time"], query["sql"].replace('"', "").replace(",", ", "))
+                    total_queries_time += float(query["time"])
+                    queries_list.append({"sql": (f"{prettify_sql}\n"), "time": float(query["time"])})
+            queries_list = sorted(queries_list, key=lambda x: -x["time"])
+            total_request_time = time.process_time() - time_start
+            total_request_time = f"{round(total_request_time, 4)}"
+            print()
+            print(_table_response_timing(lineno, total_request_time, total_queries_time, queries_count))
+            print()
+            _single_line_response_queries(lineno, queries_list)
+            print()
+            print(_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before))
+            print()
+            return response
+
+        else:
+            response = func(*args, **kwargs)
+            return response
+
+    return wrapper
 
 @contextmanager
 def DjangoProfiler(label=None, full=None):
