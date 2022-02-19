@@ -5,7 +5,6 @@ import time
 from contextlib import contextmanager
 from functools import wraps
 import psutil
-from colorclass import Color
 from django.conf import settings
 from django.db import connection
 from django.db import reset_queries
@@ -81,9 +80,9 @@ def _get_process_memory():
 
 def _table_response_timing(lineno, total_time, total_queries_time, queries_count):
     table_data = [
-        [Color("{green}Total time:{/green}"), f"{total_time}s           "],
-        [Color("{yellow}Database queries time:{/yellow}"), f"{total_queries_time}s          "],
-        [Color("{cyan}Queries count:{/cyan}"), f"{queries_count}            "],
+        ["Total time:", f"{total_time}s           "],
+        ["Database queries time:", f"{total_queries_time}s          "],
+        ["Queries count:", f"{queries_count}            "],
     ]
     table_instance = SingleTable(table_data, f" {lineno} time ")
     table_instance.inner_heading_row_border = False
@@ -116,9 +115,9 @@ def _single_line_response_queries(lineno, queries):
 
 def _table_response_memory(lineno, memory_before, memory_after, memory_difference):
     table_data = [
-        [Color("{green}Memory before:{/green}"), f"{_convert_size(memory_before)}           "],
-        [Color("{yellow}Memory after:{/yellow}"), f"{_convert_size(memory_after)}           "],
-        [Color("{cyan}Memory difference:{/cyan}"), f"{_convert_size(memory_difference)}         "],
+        ["Memory before:", f"{_convert_size(memory_before)}           "],
+        ["Memory after:", f"{_convert_size(memory_after)}           "],
+        ["Memory difference:", f"{_convert_size(memory_difference)}         "],
     ]
     table_instance = SingleTable(table_data, f" {lineno} memory ")
     table_instance.inner_heading_row_border = False

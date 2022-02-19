@@ -3,7 +3,7 @@ import sys
 import setuptools
 
 __author__ = 'Sobolev Andrey <email.asobolev@gmail.com>'
-__version__ = '0.3.2'
+__version__ = '0.4'
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name='django-simple-profiler',
     version=__version__,
-    install_requires=['colorclass', 'terminaltables', 'psutil'],
+    install_requires=['terminaltables', 'psutil'],
     author='Sobolev Andrey',
     url="https://github.com/Sobolev5/django-simple-profiler",        
     author_email='email.asobolev@gmail.com',
@@ -24,5 +24,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.10',
 )
