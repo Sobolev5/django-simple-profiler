@@ -146,13 +146,9 @@ def django_profiler(func):
             queries_list = sorted(queries_list, key=lambda x: -x["time"])
             total_request_time = time.process_time() - time_start
             total_request_time = f"{round(total_request_time, 4)}"
-            print()
-            print(_table_response_timing(lineno, total_request_time, total_queries_time, queries_count))
-            print()
-            print(_table_response_queries(lineno, queries_list[:10]))
-            print()
-            print(_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before))
-            print()
+            print("\n",_table_response_timing(lineno, total_request_time, total_queries_time, queries_count),"\n")
+            print("\n",_table_response_queries(lineno, queries_list[:10]),"\n")
+            print("\n",_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before),"\n")
             return response
 
         else:
@@ -184,13 +180,9 @@ def django_profiler_full(func):
             queries_list = sorted(queries_list, key=lambda x: -x["time"])
             total_request_time = time.process_time() - time_start
             total_request_time = f"{round(total_request_time, 4)}"
-            print()
-            print(_table_response_timing(lineno, total_request_time, total_queries_time, queries_count))
-            print()
-            _single_line_response_queries(lineno, queries_list)
-            print()
-            print(_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before))
-            print()
+            print("\n",_table_response_timing(lineno, total_request_time, total_queries_time, queries_count),"\n")
+            print("\n",_single_line_response_queries(lineno, queries_list),"\n",)
+            print("\n",_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before),"\n")
             return response
 
         else:
@@ -227,15 +219,8 @@ def DjangoProfiler(label=None, full=None):
         queries_list = sorted(queries_list, key=lambda x: -x["time"])
         total_request_time = time.process_time() - time_start
         total_request_time = f"{round(total_request_time, 4)}"
-        print()
-        print(_table_response_timing(lineno, total_request_time, total_queries_time, queries_count))
-        print()
-        if full:
-            _single_line_response_queries(lineno, queries_list)
-        else:
-            print(_table_response_queries(lineno, queries_list[:10]))
-        print()
-        print(_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before))
-        print()
+        print("\n",_table_response_timing(lineno, total_request_time, total_queries_time, queries_count),"\n")
+        print("\n",_single_line_response_queries(lineno, queries_list),"\n") if full else print("\n",_table_response_queries(lineno, queries_list[:10]),"\n")
+        print("\n",_table_response_memory(lineno, memory_before, memory_after, memory_after - memory_before),"\n")
     else:
         yield
